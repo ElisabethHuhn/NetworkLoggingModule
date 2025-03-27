@@ -8,4 +8,7 @@ interface RemoteLogDataSource {
     suspend fun logRemote(
         logItemsList: List<LogEntry>
     ): Result<String, DataError.Remote>
+
+    suspend fun fetchLogGreeting(): Result<String, DataError.Remote>
+    suspend fun fetchLogMessages(): Result<List<LogEntry>, DataError.Remote>
 }

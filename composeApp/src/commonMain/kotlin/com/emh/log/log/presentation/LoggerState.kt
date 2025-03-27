@@ -1,4 +1,4 @@
-package com.emh.log.presentation
+package com.emh.log.log.presentation
 
 import com.emh.log.domain.LogEntry
 import com.emh.log.domain.LoggingMsgSeverity
@@ -27,6 +27,9 @@ data class LoggerState(
     val totalSuccess: Int = 0,
     val totalError : Int = 0,
     val lastResponseString: String = "NO RESPONSE YET",
-    val lastStatusCode : HttpStatusCode = HttpStatusCode.OK
+    val lastStatusCode : HttpStatusCode = HttpStatusCode.OK,
+
+    val logGreeting : String = "Greeting not yet fetched",
+    val logMessages : List<LogEntry> = emptyList()
 
 )

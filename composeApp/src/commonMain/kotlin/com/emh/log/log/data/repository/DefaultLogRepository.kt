@@ -16,4 +16,12 @@ class DefaultLogRepository(
     ): Result<String, DataError.Remote> {
         return remoteLogDataSource.logRemote(logItemsList)
     }
+
+    override suspend fun fetchLogGreeting(): Result<String, DataError.Remote> {
+        return remoteLogDataSource.fetchLogGreeting()
+    }
+
+    override suspend fun fetchLogMessages(): Result<List<LogEntry>, DataError.Remote> {
+        return remoteLogDataSource.fetchLogMessages()
+    }
 }

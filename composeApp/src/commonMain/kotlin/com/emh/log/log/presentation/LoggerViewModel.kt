@@ -1,16 +1,16 @@
-package com.emh.log.presentation
+package com.emh.log.log.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.emh.log.domain.LogEntry
+import com.emh.log.log.domain.LogBusinessLogic
+import com.emh.log.log.domain.model.LogBufferStats
+import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import com.emh.log.core.domain.onError
-import com.emh.log.core.domain.onSuccess
-import com.emh.log.domain.LogEntry
-import com.emh.log.log.domain.LogBusinessLogic
-import io.ktor.http.HttpStatusCode
 
 class LoggerViewModel (
     private val logBusinessLogic: LogBusinessLogic
@@ -44,6 +44,14 @@ class LoggerViewModel (
             is LoggerAction.FlushLogBuffer -> {
                 flushLogBuffer()
             }
+            is LoggerAction.FetchLogMessages -> {
+                fetchLogMessages()
+            }
+            is LoggerAction.FetchLogGreeting -> {
+                fetchLogGreeting()
+            }
+
+
 
             else -> {}
         }
@@ -52,7 +60,7 @@ class LoggerViewModel (
     /*
      * functions to update the UI State values displayed in MainScreen UI
      */
-    fun updateIsLoading(isLoading: Boolean) {
+    private fun updateIsLoading(isLoading: Boolean) {
         _state.update { it.copy(isLoading = isLoading) }
     }
 
@@ -95,32 +103,36 @@ class LoggerViewModel (
         logBusinessLogic.setBufferDur(duration)
     }
 
-    fun updateLastQueued(logEntry: LogEntry) {
+    private fun updateLastQueued(logEntry: LogEntry) {
         _state.update { it.copy(lastBuffered = logEntry) }
     }
-    fun updateLastSent(logEntry: LogEntry) {
+    private fun updateLastSent(logEntry: LogEntry) {
         _state.update { it.copy(lastSent = logEntry) }
     }
-    fun updateTotalSent(number: Int) {
+    private fun updateTotalSent(number: Int) {
         _state.update { it.copy(totalSent = number) }
     }
-    fun updateTotalQueued(number: Int) {
+    private fun updateTotalQueued(number: Int) {
         _state.update { it.copy(totalQueued = number) }
     }
-    fun updateTotalSuccess(number: Int) {
+    private fun updateTotalSuccess(number: Int) {
         _state.update { it.copy(totalSuccess = number) }
     }
-    fun updateTotalError(number: Int) {
+    private fun updateTotalError(number: Int) {
         _state.update { it.copy(totalError = number) }
     }
-    fun updateLastResponseString(responseString: String) {
+    private fun updateLastResponseString(responseString: String) {
         _state.update { it.copy(lastResponseString = responseString) }
     }
-    fun updateLastHttpStatus(status: HttpStatusCode) {
+    private fun updateLastHttpStatus(status: HttpStatusCode) {
         _state.update { it.copy(lastStatusCode = status) }
     }
-
-
+    private fun updateLogMessages(messages: List<LogEntry>) {
+        _state.update { it.copy(logMessages = messages) }
+    }
+    private fun updateLogGreeting(greeting: String) {
+        _state.update { it.copy(logGreeting = greeting) }
+    }
 
 
     /*
@@ -128,35 +140,45 @@ class LoggerViewModel (
      */
 
     private fun generateLogMessages() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val logBufferStats =
                 logBusinessLogic.generateLogMessages(_state.value.numberToGenerate)
 
             //update the state with the result
-
-            updateTotalSent(logBufferStats.totalSent)
-            updateTotalQueued(logBufferStats.numberQueued)
-            updateTotalSuccess(logBufferStats.numberSuccess)
-            updateTotalError(logBufferStats.numberError)
-            updateLastResponseString(logBufferStats.lastResponseString)
-            updateLastHttpStatus(logBufferStats.lastStatus)
-            updateLastQueued(logBufferStats.lastQueued)
-            updateLastSent(logBufferStats.lastSent)
+           updateStats(logBufferStats)
         }
     }
 
     private fun flushLogBuffer() {
-        viewModelScope.launch {
+        viewModelScope.launch (Dispatchers.IO) {
             val result = logBusinessLogic.flushBuffer()
-            result.onSuccess { responseString ->
-               updateLastResponseString(responseString)
-            }
-            result.onError { it ->
-                //todo update the state with the result
-                updateLastHttpStatus(HttpStatusCode.BadRequest)
-            }
+            updateStats(result)
         }
     }
 
+    private fun updateStats(logBufferStats: LogBufferStats) {
+        updateLoggerBufferLength(logBufferStats.bufferSize.toString())
+        updateTotalSent(logBufferStats.totalSent)
+        updateTotalQueued(logBufferStats.numberQueued)
+        updateTotalSuccess(logBufferStats.numberSuccess)
+        updateTotalError(logBufferStats.numberError)
+        updateLastQueued(logBufferStats.lastQueued)
+        updateLastSent(logBufferStats.lastSent)
+        updateLastResponseString(logBufferStats.lastResponseString)
+        updateLastHttpStatus(logBufferStats.lastStatus)
+    }
 
+    private fun fetchLogMessages() {
+        viewModelScope.launch (Dispatchers.IO) {
+            val result = logBusinessLogic.fetchLogMessages()
+            updateLogMessages(result)
+        }
+    }
+
+    private fun fetchLogGreeting() {
+        viewModelScope.launch (Dispatchers.IO) {
+            val result = logBusinessLogic.fetchLogGreeting()
+            updateLogGreeting(result)
+        }
+    }
 }

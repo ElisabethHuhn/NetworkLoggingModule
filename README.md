@@ -11,15 +11,30 @@ The main purpose of this project is to gain experience:
 * TODO Multi Module Multiplatform project
 * Compose Screen Navigation
 
+# Instructions for use
+
+# Left to do
+* Consolidate DataError and NetworkError
+* hide keyboard when button pressed
+* The application may be doing too much work on its main thread.
+* Add get to server
+* Add Button to trigger get
+* Add a new screen for displaying log messages fetched from the server
+* Compose navigation
+* Add local ROOM DB
+* Automated testing
+  * UI
+  * Viewmodel
+  * Repository
+  * Network data source (Client)
+  * Local data source
+  * Server
+
 # Architecture images
-
-## Ktor Clean Code Architecture
-
-![Clean Code Architecture](images/ktor_clean_code_architecture.png)
-
-## Ktor Client Calls
-
-![Kotlin Ktor Client Calls](images/ktor_client_calls.png)
+Diagrams illustrating the architecture are located in the top level directory /diagrams
+* Ktor Clean Code Architecture
+* Ktor Client Calls
+* Ktor Client Calls through Layers
 
 # Requirements
 * Include a logger module that can be reused in other projects

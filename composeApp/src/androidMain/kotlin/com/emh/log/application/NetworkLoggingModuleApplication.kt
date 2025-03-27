@@ -1,4 +1,4 @@
-package com.emh.log.plcoding
+package com.emh.log.application
 
 import android.app.Application
 import com.emh.log.di.initKoin

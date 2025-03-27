@@ -1,4 +1,4 @@
-package com.emh.log.presentation
+package com.emh.log.log.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -57,6 +57,12 @@ fun LoggerScreen(
         LastMessages(state)
 
         SentBufferStats(state)
+
+        LastErrorStats(state)
+
+        LogGreeting(state = state, onAction = onAction)
+
+        LogMessages(state = state, onAction = onAction)
     }
 }
 
@@ -105,8 +111,11 @@ private fun SendBufferTriggers(
 
     OutlinedTextField(
         value = if (state.numberToGenerate > 0) state.numberToGenerate.toString() else "",
-        onValueChange = { enteredNumToGen: String ->
-            onAction(LoggerAction.UpdateNumberToGenerateChanged(enteredNumToGen))
+        onValueChange = { enteredNumToGen: String -> onAction(
+            LoggerAction.UpdateNumberToGenerateChanged(
+                enteredNumToGen
+            )
+        )
         },
         label = {
             Text(
@@ -223,6 +232,103 @@ private fun SentBufferStats(state: LoggerState) {
         text = "total Error = ${state.totalError}",
         style = MaterialTheme.typography.body1,
     )
+}
+
+
+@Composable
+private fun LastErrorStats(state: LoggerState) {
+    Spacer(modifier = Modifier.height(10.dp))
+    Divider(
+        color = MaterialTheme.colors.primary,
+        thickness = 2.dp,
+        startIndent = 0.dp
+    )
+    Spacer(modifier = Modifier.height(10.dp))
+
+    Text(
+        text = "Last Error Stats: ",
+        style = MaterialTheme.typography.h6,
+        fontWeight = FontWeight.Bold
+    )
+
+    Text(
+        text = "String = ${state.lastResponseString}",
+        style = MaterialTheme.typography.body1,
+    )
+    Text(
+        text = "Status = ${state.lastStatusCode}",
+        style = MaterialTheme.typography.body1,
+    )
+
+}
+
+@Composable
+private fun LogGreeting(
+    state: LoggerState,
+    onAction: (LoggerAction) -> Unit
+) {
+    Spacer(modifier = Modifier.height(10.dp))
+    Divider(
+        color = MaterialTheme.colors.primary,
+        thickness = 2.dp,
+        startIndent = 0.dp
+    )
+    Spacer(modifier = Modifier.height(10.dp))
+    Button(
+        onClick = {
+            onAction(LoggerAction.FetchLogGreeting)
+        }
+    ) {
+        Text(
+            text = "Fetch Log Greeting",
+            style = MaterialTheme.typography.button,
+        )
+    }
+    Text(
+        text = state.logGreeting,
+        style = MaterialTheme.typography.body1,
+    )
+}
+
+@Composable
+private fun LogMessages(
+    state: LoggerState,
+    onAction: (LoggerAction) -> Unit
+) {
+    Spacer(modifier = Modifier.height(10.dp))
+    Divider(
+        color = MaterialTheme.colors.primary,
+        thickness = 2.dp,
+        startIndent = 0.dp
+    )
+    Spacer(modifier = Modifier.height(10.dp))
+    Button(
+        onClick = {
+            onAction(LoggerAction.FetchLogMessages)
+        }
+    ) {
+        Text(
+            text = "Fetch Logged message(s)",
+            style = MaterialTheme.typography.button,
+        )
+    }
+
+    Text(
+        text = "Fetched ${state.logMessages.size} messages ",
+        style = MaterialTheme.typography.h6,
+        fontWeight = FontWeight.Bold
+    )
+
+    Text(
+        text = "First Message ",
+        style = MaterialTheme.typography.h6,
+        fontWeight = FontWeight.Bold
+    )
+    Text(
+        text = "= ${state.logMessages.firstOrNull()}",
+        style = MaterialTheme.typography.body1,
+    )
+
 }
 
 

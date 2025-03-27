@@ -6,6 +6,8 @@ import kotlinx.datetime.format.*
 /**
  * Format the current timestamp in the format "YYYY-MM-DDTHH:MM:SSZ"
  */
+const val validFormat = "yyyy-MM-dd'T'HH:mm:ss"
+
 fun formatCurrentTimestamp() : String {
     val currentDateTime = getNow()
     return currentDateTime.format(
@@ -32,4 +34,18 @@ fun getNow() : LocalDateTime {
 
 fun getEpochMillis() : Long {
     return Clock.System.now().toEpochMilliseconds()
+}
+
+
+fun isTimestampFormatValid(
+    timestamp: String,
+    format: String = validFormat
+): Boolean {
+    return try {
+        // Formats.ISO is used. 2023-01-02T23:40:57.120
+        val isValid = LocalDateTime.parse(input = timestamp)
+        true
+    } catch (e: Exception) {
+        false
+    }
 }

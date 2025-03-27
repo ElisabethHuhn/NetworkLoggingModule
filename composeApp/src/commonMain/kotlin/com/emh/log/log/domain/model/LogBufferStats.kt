@@ -5,7 +5,7 @@ import com.emh.log.domain.LoggingMsgSeverity
 import io.ktor.http.HttpStatusCode
 
 data class LogBufferStats(
-    var bufferSize : Int = 10,
+    var bufferSize : Int = 1,
     var totalSent : Int = 0,
     var numberQueued : Int = 0,
     var numberSuccess: Int = 0,

@@ -1,24 +1,24 @@
 package com.emh.log
 
 
-import com.emh.log.data.LogEntryDto
+import com.emh.log.domain.LogEntry
 import com.emh.log.domain.LoggingMsgSeverity
+import com.emh.log.util.isTimestampFormatValid
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
-import io.ktor.server.http.content.staticResources
 import io.ktor.server.request.contentLength
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
-import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 
 
-val logEntryStorage = mutableListOf<LogEntryDto>()
+val logEntryStorage = mutableListOf<LogEntry>()
 
 fun Application.configureRouting() {
+    // routing {} installs the Routing plugin
     routing {
         // Routes define paths that your server responds to
         // Routes are processed in the order they are defined.
@@ -28,6 +28,9 @@ fun Application.configureRouting() {
         get("/") {
             call.respondText("Ktor: Hello, World!")
         }
+        get("http://10.0.2.2/") {
+            call.respondText("Ktor: Hello, From your LOG server!")
+        }
 
         // Static resources are files that are served directly by the server without any processing.
 
@@ -35,14 +38,14 @@ fun Application.configureRouting() {
         // The first parameter is the path to the directory containing the resources.
         // The second parameter is the path to the URL that the resources will be served from.
         // In this case, the resources are served from the static directory and are available at the /static URL.
-        staticResources("static", "static")
+//        staticResources("static", "static")
 
-        route("/log") {
-            get {
+//        route("/log") {
+            get ("/log"){
                 call.respond(logEntryStorage)
             }
 
-            post {
+            post ("/log"){
                 if (call.request.contentLength() == 0L) {
                     call.respondText(
                         text = "Request body is empty",
@@ -50,10 +53,18 @@ fun Application.configureRouting() {
                     )
                 } else {
 //                    val rawJson = call.receiveText()
+//                    if (rawJson.isEmpty()) call.respondText (
+//                        text = "Request body is empty",
+//                        status = HttpStatusCode.BadRequest
+//                    )
 
-                    val logEntries : List<LogEntryDto>? = try {
-                        call.receive<List<LogEntryDto>>()
-                    } catch (e: Exception) {null}
+
+                    val logEntries : List<LogEntry>? = try {
+                        call.receive<List<LogEntry> >()
+                    } catch (e: Exception) {
+                        println(e.message)
+                        null
+                    }
 
                     if (logEntries == null) {
                         call.respondText(
@@ -76,13 +87,13 @@ fun Application.configureRouting() {
                         }
                         if (invalidEntries.isNotEmpty()) {
                             call.respondText(
-                                text = "Missing required fields: ${invalidEntries.joinToString { it.message.toString() }}",
+                                text = "Missing required fields: ${invalidEntries.joinToString { it.message }}",
                                 status = HttpStatusCode.BadRequest
                             )
                         }
 
                         val invalidSeverity = logEntries.filter { logEntry ->
-                            isSeverityValid(logEntry.severity ?: "")
+                            isSeverityInvalid(logEntry.severity)
                         }
                         if (invalidSeverity.isNotEmpty()) {
                             call.respondText(
@@ -110,7 +121,7 @@ fun Application.configureRouting() {
                     }
                 }
             }
-        }
+//        }
 
         //use coroutines
 //        get("/data") {
@@ -122,16 +133,15 @@ fun Application.configureRouting() {
     }
 }
 
-fun isSeverityValid(severity: String): Boolean {
-    return severity in LoggingMsgSeverity.entries.map { it.name }
+fun isSeverityInvalid(severity: LoggingMsgSeverity): Boolean {
+    if (severity == LoggingMsgSeverity.NOT_ASSIGNED) return true
+    val isValid : Boolean = LoggingMsgSeverity.entries.any { loggingMsgSeverity ->
+        loggingMsgSeverity == severity
+    }
+    return !isValid
 }
+
 fun isTimestampValid(timestamp: String?): Boolean {
-   try {
        if (timestamp.isNullOrEmpty()) return false
-       //assure the timestamp is a long integer
-       timestamp.toLong()
-       return true
-   } catch (e: Exception) {
-       return false
-   }
+       return isTimestampFormatValid(timestamp = timestamp)
 }

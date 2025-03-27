@@ -1,4 +1,4 @@
-package com.emh.log.plcoding
+package com.emh.log.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

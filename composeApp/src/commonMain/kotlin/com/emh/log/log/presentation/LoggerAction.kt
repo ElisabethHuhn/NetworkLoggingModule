@@ -1,4 +1,4 @@
-package com.emh.log.presentation
+package com.emh.log.log.presentation
 
 sealed interface LoggerAction {
     data object OnBackClick: LoggerAction
@@ -7,4 +7,7 @@ sealed interface LoggerAction {
     data class UpdateLoggerBufferDuration(val durationString: String): LoggerAction
     data object GenerateLogMessages: LoggerAction
     data object FlushLogBuffer: LoggerAction
+    data object FetchLogMessages: LoggerAction
+    data object FetchLogGreeting: LoggerAction
+
 }

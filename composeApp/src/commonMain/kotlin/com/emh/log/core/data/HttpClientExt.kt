@@ -5,9 +5,14 @@ import com.emh.log.core.domain.Result
 import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.call.body
 import io.ktor.client.network.sockets.SocketTimeoutException
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.coroutines.ensureActive
 import io.ktor.client.statement.HttpResponse
+import kotlinx.serialization.SerializationException
+import java.net.ConnectException
+import java.net.SocketException
+import java.net.UnknownServiceException
 import kotlin.coroutines.coroutineContext
 
 suspend inline fun <reified T> safeCall(
@@ -19,7 +24,25 @@ suspend inline fun <reified T> safeCall(
         return Result.Error(DataError.Remote.REQUEST_TIMEOUT)
     } catch(e: UnresolvedAddressException) {
         return Result.Error(DataError.Remote.NO_INTERNET)
+    } catch(e: SerializationException) {
+        coroutineContext.ensureActive()
+        return Result.Error(DataError.Remote.SERIALIZATION)
+    } catch(e: ConnectException) {
+        coroutineContext.ensureActive()
+        println(e.stackTrace)
+        return Result.Error(DataError.Remote.CONNECTION_FAILED)
+    } catch(e: HttpRequestTimeoutException) {
+        coroutineContext.ensureActive()
+        return Result.Error(DataError.Remote.REQUEST_TIMEOUT)
+    } catch(e: UnknownServiceException) {
+        coroutineContext.ensureActive()
+        println(e.stackTrace)
+        return Result.Error(DataError.Remote.UNKNOWN_SERVICE)
+    } catch(e: SocketException) {
+        coroutineContext.ensureActive()
+        return Result.Error(DataError.Remote.SOCKET_EXCEPTION)
     } catch (e: Exception) {
+        println(e.message)
         coroutineContext.ensureActive()
         return Result.Error(DataError.Remote.UNKNOWN)
     }

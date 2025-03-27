@@ -16,8 +16,11 @@ import io.ktor.http.HttpStatusCode
 class LogBusinessLogic (
     private val logRepository: LogRepository
 ){
-    var logCounter = 0
-    var logEntries = mutableListOf<LogEntry>()
+    private var logCounter = 0
+    private var logEntries = mutableListOf<LogEntry>()
+    private var timeLastSent : Long = 0L
+    private val logBufferStats = LogBufferStats()
+    private val sendLock = Mutex(false)
 
     fun setMaxBuffer(newSize: Int) {
         logBufferStats.bufferSize = newSize
@@ -28,12 +31,6 @@ class LogBusinessLogic (
         bufferDuration = newDuration
     }
 
-    var timeLastSent : Long = 0L
-
-    val logBufferStats = LogBufferStats()
-
-    val sendLock = Mutex(false)
-
 
     /*
      * Generate a number of log messages
@@ -42,7 +39,7 @@ class LogBusinessLogic (
         numberToGenerate: Int,
     ) : LogBufferStats {
         //initialize time last sent on initial call
-        timeLastSent = getEpochMillis()
+        if (timeLastSent == 0L) timeLastSent = getEpochMillis()
 
         for (i in 1..numberToGenerate) {
             //build a log message
@@ -69,45 +66,39 @@ class LogBusinessLogic (
         return logBufferStats
     }
 
-    suspend fun logMessage(logEntry: LogEntry) : LogBufferStats {
+    private suspend fun logMessage(logEntry: LogEntry) : LogBufferStats {
         logEntries.add(logEntry)
 
-        val timeNowMs = getEpochMillis()
-        val timeDif = timeNowMs - timeLastSent
-
-        if ( (logEntries.size >= logBufferStats.bufferSize) ||
-             (timeDif > bufferDuration)
-        ) {
-           flushBuffer()
-        }
-        logBufferStats.numberQueued = logEntries.size
         logBufferStats.lastQueued = logEntry
+        logBufferStats.numberQueued = logEntries.size
 
-        //dd=eep copy the buffer stats
-        val returnStats : LogBufferStats = LogBufferStats()
-        returnStats.apply {
-            bufferSize = logBufferStats.bufferSize
-            totalSent = logBufferStats.totalSent
-            numberQueued = logBufferStats.numberQueued
-            numberSuccess = logBufferStats.numberSuccess
-            numberError = logBufferStats.numberError
-            lastQueued = logBufferStats.lastQueued.copy()
-            lastSent = logBufferStats.lastSent.copy()
-            lastResponseString = logBufferStats.lastResponseString
-            lastStatus = logBufferStats.lastStatus
+        var timeExpired = false
+        if (bufferDuration <= 0) {
+            val timeNowMs = getEpochMillis()
+            val timeDif = timeNowMs - timeLastSent
+            if (timeDif > bufferDuration) {
+                timeExpired = true
+            }
         }
-        return returnStats
+
+        val isBufferFull = logEntries.size >= logBufferStats.bufferSize
+
+        return if ( isBufferFull || timeExpired) {
+            flushBuffer() //updates logBufferStats
+        } else {
+            deepCopyStats()
+        }
     }
 
-    suspend fun flushBuffer() : Result<String, DataError.Remote>  {
+    suspend fun flushBuffer() : LogBufferStats  {
         var response : Result<String, DataError.Remote>
 
         //lock out any other coroutines
         sendLock.withLock {
             val sendList = logEntries.toList()
-            logEntries = mutableListOf<LogEntry>()
+            logEntries = mutableListOf()
             timeLastSent = getEpochMillis()
-            if (sendList.size > 0) {
+            if (sendList.isNotEmpty()) {
                 response = logRepository.sendLogBuffer(sendList)
                 logBufferStats.totalSent += sendList.size
                 logBufferStats.numberQueued = 0
@@ -123,9 +114,46 @@ class LogBusinessLogic (
                     logBufferStats.numberError += sendList.size
                     logBufferStats.lastStatus = HttpStatusCode.BadRequest
                 }
-                return response
             }
-            return Result.Success("No log entries to send")
+            return deepCopyStats()
         }
     }
+
+    private fun deepCopyStats() : LogBufferStats {
+        val returnStats = LogBufferStats()
+
+        //dd=eep copy the buffer stats
+        returnStats.apply {
+            bufferSize = logBufferStats.bufferSize
+            totalSent = logBufferStats.totalSent
+            numberQueued = logBufferStats.numberQueued
+            numberSuccess = logBufferStats.numberSuccess
+            numberError = logBufferStats.numberError
+            lastSent = logBufferStats.lastSent.copy()
+            lastResponseString = logBufferStats.lastResponseString
+            lastStatus = logBufferStats.lastStatus
+        }
+        return returnStats
+    }
+
+    suspend fun fetchLogGreeting() : String {
+        var returnString =  "Error fetching log greeting"
+
+        val result = logRepository.fetchLogGreeting()
+        result.onSuccess { successString ->
+            returnString = successString
+        }
+       return returnString
+    }
+
+    suspend fun fetchLogMessages() : List<LogEntry> {
+        var returnList =  listOf<LogEntry>()
+
+        val result = logRepository.fetchLogMessages()
+        result.onSuccess { successList ->
+            returnList = successList
+        }
+       return returnList
+    }
+
 }
