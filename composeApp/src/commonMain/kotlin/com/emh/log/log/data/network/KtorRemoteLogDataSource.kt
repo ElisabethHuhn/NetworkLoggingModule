@@ -1,7 +1,7 @@
 package com.emh.log.log.data.network
 
 import com.emh.log.core.domain.Result
-import com.emh.log.CLIENT_BASE_URL
+import com.emh.log.CLIENT_LOCAL_URL
 import com.emh.log.SERVER_PORT
 import com.emh.log.core.data.safeCall
 import com.emh.log.core.domain.DataError
@@ -14,8 +14,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
 
-//private const val BASE_URL = "http://localhost:5000/log"
-//private const val BASE_URL = "https://ehuhn.free.beeceptor.com/log"
 
 class KtorRemoteLogDataSource(
     private val httpClient: HttpClient
@@ -25,7 +23,9 @@ class KtorRemoteLogDataSource(
         logItemsList: List<LogEntry>
     ): Result<String, DataError.Remote> {
 
-        val url = "$CLIENT_BASE_URL:$SERVER_PORT/log"
+//        val url = "$CLIENT_BASE_URL:$SERVER_PORT/log"
+//        val url = "$CLIENT_LOGGER_HOST:$SERVER_PORT/log"
+        val url = "$CLIENT_LOCAL_URL:$SERVER_PORT/log"
 
         return safeCall<String> {
             httpClient.post(
@@ -38,7 +38,8 @@ class KtorRemoteLogDataSource(
     }
 
     override suspend fun fetchLogGreeting(): Result<String, DataError.Remote> {
-        val url = "$CLIENT_BASE_URL:$SERVER_PORT"
+//        val url = "$CLIENT_BASE_URL:$SERVER_PORT"
+        val url = "$CLIENT_LOCAL_URL:$SERVER_PORT"
 
         return safeCall<String> {
             httpClient.get(
@@ -48,7 +49,7 @@ class KtorRemoteLogDataSource(
     }
 
     override suspend fun fetchLogMessages(): Result<List<LogEntry>, DataError.Remote> {
-        val url = "$CLIENT_BASE_URL:$SERVER_PORT/log"
+        val url = "$CLIENT_LOCAL_URL:$SERVER_PORT/log"
 
         return safeCall<List<LogEntry>> {
             httpClient.get(
