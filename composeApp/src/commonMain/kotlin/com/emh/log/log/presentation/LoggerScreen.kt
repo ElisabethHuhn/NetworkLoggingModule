@@ -320,12 +320,12 @@ private fun LogMessages(
     )
 
     Text(
-        text = "First Message ",
+        text = "Last Message ",
         style = MaterialTheme.typography.h6,
         fontWeight = FontWeight.Bold
     )
     Text(
-        text = "= ${state.logMessages.firstOrNull()}",
+        text = "= ${state.logMessages.lastOrNull()}",
         style = MaterialTheme.typography.body1,
     )
 
