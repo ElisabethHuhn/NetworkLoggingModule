@@ -13,10 +13,21 @@ The main purpose of this project is to gain experience:
 
 # Instructions for use
 
-## Server IP address
-The server localhost is hardcoded. You need to change the server IP address in the file `shared/src/commonMain/kotlin/com/example/shared/network/NetworkClient.kt` to your server's IP address.
+Load the project into Android Studio 
+
+The server localhost is hardcoded. 
+* look up your IO address with terminal command `ip addr show` or `ifconfig`
+* You need to change the server IP address in the files:
+  * `shared/src/androidMain/res/xml/network_security_confid.xml`
+  *  `shared/src/commonMain/kotlin/com/emh/log/util/Constants.kt` in the constant `CLIENT_LOCAL_URL`.
+* Go to the file `server/src/com/emh/log/Application` and start the server by running the function main
+* You can use the Android emulator or a real device to run the app.
+  * You can run it from the composeApp config on the top menu bar, or from the App class in `composApp/src/composeMain/kotlin/com/emh/log/app/App.kt`
+  * If you are using the Android emulator, make sure that the server IP address is reachable from the emulator.
+  * If you are using a real device, make sure that the server IP address is reachable from the device.
 
 # Left to do
+* Test the desktopApp
 * Consolidate DataError and NetworkError
 * hide keyboard when button pressed
 * The application may be doing too much work on its main thread.
