@@ -13,14 +13,13 @@ The main purpose of this project is to gain experience:
 
 # Instructions for use
 
+## Server IP address
+The server localhost is hardcoded. You need to change the server IP address in the file `shared/src/commonMain/kotlin/com/example/shared/network/NetworkClient.kt` to your server's IP address.
+
 # Left to do
 * Consolidate DataError and NetworkError
 * hide keyboard when button pressed
 * The application may be doing too much work on its main thread.
-* Add get to server
-* Add Button to trigger get
-* Add a new screen for displaying log messages fetched from the server
-* Compose navigation
 * Add local ROOM DB
 * Automated testing
   * UI
@@ -45,13 +44,11 @@ The project uses State of the Art Android Architecture circa 2025. It uses:
 * Compose Kotlin Multiplatform
 * Kotlin 100%
 * Compose for building UI
-~~* TODO - Compose NavGraph navigation~~
+* Compose NavGraph navigation
 * Koin for Dependency Injection
   * For now, the only classes that are injected are the HTTP Client, ViewModel, and Repository
 * Ktor for Network calls
 ~~* TODO Coil for loading images from network URLs~~
-~~* Accompanist for permissions~~
-~~* FusedLocationProvider from GooglePlayServices for location management~~
 * MVI to
   * persist UI local cache across orientation changes
   * UI state variables governing UI compose
@@ -73,42 +70,6 @@ The project uses State of the Art Android Architecture circa 2025. It uses:
     * reference https://developer.android.com/codelabs/jetpack-compose-testing#0
 *
 
-~~## Update secrets
-* add secret to local.properties
-* Load the secret from BuildConfig~~
-
-## Update Dependency Injection i.e. Koin
-
-## Update Permissions
-
-## Change UI
-* Add new UI ScreenRoute files under UI package
-  * Replace WeatherRoute with your new screen
-* Update NavGraph to add new screens
-* Call the appropriate UI compose function from MainActivity
-* Update MainContract
-
-## Update ViewModel
-* Add new ViewModel files under ViewModel package
-  * Replace WeatherViewModel with your new ViewModel
-
-## Update Repository
-
-* Add new Repository files under Repository package
-  * Replace WeatherRepository with your new Repository
-  * Replace WeatherRepositoryImpl with your new RepositoryImpl
-  * Replace WeatherRepositoryImplTest with your new RepositoryImplTest
-  * Replace WeatherRepositoryImplInstrumentedTest with your new RepositoryImplInstrumentedTest
-
-## Update Data Source
-
-## Update Data Model
-
-## Update Network i.e. Retrofit
-
-## Update Local Storage i.e. Room
-
-## Update Unit Tests
 
 
 # Compose Multiplatform

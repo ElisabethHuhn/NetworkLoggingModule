@@ -12,14 +12,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class LoggerViewModel (
+class LogViewModel (
     private val logBusinessLogic: LogBusinessLogic
 ) : ViewModel() {
 
     /* ********************************************************************
      * State values displayed in MainScreen UI
      */
-    private val _state = MutableStateFlow(LoggerState())
+    private val _state = MutableStateFlow(LogState())
     //if there needs to be initialization, use ,onStart{} and .stateIn{}
     val state = _state.asStateFlow()
 
@@ -27,27 +27,27 @@ class LoggerViewModel (
     /*
      * actions triggered by User in MainScreen UI
      */
-    fun onAction(action: LoggerAction) {
+    fun onAction(action: LogAction) {
         when(action) {
-            is LoggerAction.UpdateLoggerBufferLength -> {
+            is LogAction.UpdateLogBufferLength -> {
                 updateLoggerBufferLength(action.lengthString)
             }
-            is LoggerAction.UpdateLoggerBufferDuration -> {
+            is LogAction.UpdateLogBufferDuration -> {
                 updateLoggerBufferDuration(action.durationString)
             }
-            is LoggerAction.UpdateNumberToGenerateChanged -> {
+            is LogAction.UpdateNumberToGenerateChanged -> {
                 updateNumberToGenerate(action.number)
             }
-            is LoggerAction.GenerateLogMessages -> {
+            is LogAction.GenerateLogMessages -> {
                 generateLogMessages()
             }
-            is LoggerAction.FlushLogBuffer -> {
+            is LogAction.FlushLogBuffer -> {
                 flushLogBuffer()
             }
-            is LoggerAction.FetchLogMessages -> {
+            is LogAction.FetchLogMessages -> {
                 fetchLogMessages()
             }
-            is LoggerAction.FetchLogGreeting -> {
+            is LogAction.FetchLogGreeting -> {
                 fetchLogGreeting()
             }
 
@@ -164,7 +164,7 @@ class LoggerViewModel (
         updateTotalError(logBufferStats.numberError)
         updateLastQueued(logBufferStats.lastQueued)
         updateLastSent(logBufferStats.lastSent)
-        updateLastResponseString(logBufferStats.lastResponseString)
+        updateLastResponseString(logBufferStats.lastResultString)
         updateLastHttpStatus(logBufferStats.lastStatus)
     }
 

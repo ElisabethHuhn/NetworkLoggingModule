@@ -51,8 +51,10 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.lifecycle.viewmodel)
-            implementation(libs.navigation.compose)
 
+            //compose navigation
+            implementation(libs.jetbrains.compose.navigation)
+//            implementation(libs.androidx.navigation.compose)
 
             //ktor
             implementation(libs.ktor.client.content.negotiation)
@@ -98,6 +100,8 @@ android {
 }
 
 dependencies {
+//    implementation(libs.androidx.navigation.compose)
+//    implementation(libs.androidx.navigation.compose.jvmstubs)
     debugImplementation(compose.uiTooling)
 }
 

@@ -102,7 +102,7 @@ class LogBusinessLogic (
                 response = logRepository.sendLogBuffer(sendList)
                 logBufferStats.totalSent += sendList.size
                 logBufferStats.numberQueued = 0
-                logBufferStats.lastResponseString = response.toString()
+                logBufferStats.lastResultString = response.toString()
                 logBufferStats.lastQueued = sendList.last()
                 logBufferStats.lastSent = sendList.last()
 
@@ -130,7 +130,7 @@ class LogBusinessLogic (
             numberSuccess = logBufferStats.numberSuccess
             numberError = logBufferStats.numberError
             lastSent = logBufferStats.lastSent.copy()
-            lastResponseString = logBufferStats.lastResponseString
+            lastResultString = logBufferStats.lastResultString
             lastStatus = logBufferStats.lastStatus
         }
         return returnStats

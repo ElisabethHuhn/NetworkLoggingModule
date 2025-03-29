@@ -19,13 +19,15 @@ kotlinTest = "2.1.10"
 kotlinx-coroutines = "1.10.1"
 kotlinxDatetime = "0.6.2"
 
+
 koin = "4.0.0"
 koinComposeMultiplatform = "4.0.0"
-navigationCompose = "2.8.0-alpha10"
 lifecycleViewmodel = "2.8.7"
 
 ktor = "3.1.1"
 logback = "1.5.16"
+navigationCompose = "2.8.0-alpha10"
+
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -55,12 +57,12 @@ koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koinComp
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koinComposeMultiplatform" }
 
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycleViewmodel"}
-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 
 # Serialization
 # Note that while the plugin has version the same as the compiler one, runtime library has different coordinates, repository and versioning.
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+
 
 
 # Ktor client side
@@ -83,6 +85,9 @@ ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "k
 # Ktor server side testing
 ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
 ktor-server-tests = { module = "io.ktor:ktor-server-tests-jvm", version.ref = "ktor" }
+
+# androidx.navigation:navigation-compose,  doesn’t work for Compose Multiplatform.
+jetbrains-compose-navigation = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version.ref= "navigationCompose"}
 
 
 

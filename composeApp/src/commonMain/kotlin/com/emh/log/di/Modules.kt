@@ -8,7 +8,7 @@ import com.emh.log.log.data.network.KtorRemoteLogDataSource
 import com.emh.log.log.domain.LogBusinessLogic
 import com.emh.log.log.domain.LogRepository
 import com.emh.log.log.data.repository.DefaultLogRepository
-import com.emh.log.log.presentation.LoggerViewModel
+import com.emh.log.log.presentation.LogViewModel
 
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
@@ -28,6 +28,6 @@ val sharedModule = module {
     singleOf(::DefaultLogRepository).bind<LogRepository>()
 
     single { LogBusinessLogic(get()) }
-    viewModelOf(::LoggerViewModel)
+    viewModelOf(::LogViewModel)
 
 }

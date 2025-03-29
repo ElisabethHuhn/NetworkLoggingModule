@@ -4,10 +4,10 @@ import com.emh.log.domain.LogEntry
 import com.emh.log.domain.LoggingMsgSeverity
 import io.ktor.http.HttpStatusCode
 
-data class LoggerState(
+data class LogState(
     val isLoading: Boolean = true,
 
-    val bufferLength: Int = 1,
+    val bufferLength: Int = 11,
     val bufferDuration: Long = 1000L, // 1 second
     val numberToGenerate: Int = 10,
 

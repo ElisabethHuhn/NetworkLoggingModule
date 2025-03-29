@@ -20,7 +20,7 @@ data class LogBufferStats(
         timestamp = "NO TIMESTAMP YET",
         severity = LoggingMsgSeverity.NOT_ASSIGNED
     ),
-    var lastResponseString: String = "NO RESPONSE YET",
+    var lastResultString: String = "NO RESPONSE YET",
     var lastStatus: HttpStatusCode = HttpStatusCode.OK
 
     )
